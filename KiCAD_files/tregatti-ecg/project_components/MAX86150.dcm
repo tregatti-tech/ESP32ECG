@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP MAX86150EFFT
+D Biometric Sensors 3rd Gen High-Accuracy Pulse Oximetry and Heart Rate Bio Sensor
+K Sensor Bio Biometry Pulse ECG Heart Rate Health Oximetry
+F https://datasheets.maximintegrated.com/en/ds/MAX86150.pdf
+$ENDCMP
+#
+#End Doc Library
