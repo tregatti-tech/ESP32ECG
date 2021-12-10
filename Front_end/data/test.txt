@@ -1,0 +1,4 @@
+Some example data
+to be send to the client
+using websockets
+is written here..
