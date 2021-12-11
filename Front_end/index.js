@@ -6,6 +6,8 @@ const app = express();
 //   console.log(123);
 // }
 
+const PORT = process.env.PORT || 8080;
+
 app.use(express.static('public'));
 
 app.set('view engine', 'ejs');
@@ -15,6 +17,6 @@ app.get('/', (req, res) => {
   utils.renderWithLayout(res, 'home', 'HOME');
 });
 
-app.listen(8080, () => {
-  console.log('Server is listening on :8080');
+app.listen(PORT, () => {
+  console.log(`Server is listening on ${[PORT]}...`);
 });
