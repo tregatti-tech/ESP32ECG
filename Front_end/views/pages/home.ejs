@@ -1,6 +1,33 @@
 <div id="root">
     <canvas id="grid"></canvas>
-    <canvas id="holter"></canvas>
+    <!-- <canvas id="holter"></canvas> -->
+    <div id="ecg-plot" class="container-fluid" style="margin-top: 50px; margin-left: 100px;">
+        <div class="col">
+          <h1>ECG <i class="fas fa-diagnoses"></i></h1>
+          <p>Showing qrs complexes through timeline</p>      
+          <p>Heart rate and SpO2</p>      
+        </div>
+          <div class="row">
+            <div id="real-time-plot" class="col-sm-6" style="border-right: 1px solid; border-color: green;">
+              <canvas id="holter" width='700' height='350'></canvas>
+            </div>
+            <div id="extra-info" class="col-sm-2" style="background-color: rgb(50, 61, 61); color: green;">   
+              <div class="container">
+                <p>Heart rate</p>
+                  <p class="heart">
+                    <i class="fa fa-heart fa-2x fa-beat"></i>
+                </p>
+                <p style="height: 50 px; border-bottom: 1px solid; border-color: green;"></p>
+                <!-- <div id="saturation" class="row-sm-2" style="color: green;">SpO2</div> -->
+                <p>SpO2 %</p>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
 </div>
 <div id="real-time-plot">
 </div>
