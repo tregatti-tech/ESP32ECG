@@ -1,5 +1,4 @@
 <div id="root">
-    <canvas id="grid"></canvas>
     <!-- <canvas id="holter"></canvas> -->
     <div id="ecg-plot" class="container-fluid" style="margin-top: 50px; margin-left: 100px;">
         <div class="col">
@@ -8,8 +7,9 @@
           <p>Heart rate and SpO2</p>      
         </div>
           <div class="row">
-            <div id="real-time-plot" class="col-sm-6" style="border-right: 1px solid; border-color: green;">
-              <canvas id="holter" width='700' height='350'></canvas>
+            <div id="real-time-plot" class="col-sm-6" style="border-right: 1px solid; border-color: green; height: 500px;">
+              <canvas id="grid"></canvas> 
+              <canvas id="holter"></canvas>
             </div>
             <div id="extra-info" class="col-sm-2" style="background-color: rgb(50, 61, 61); color: green;">   
               <div class="container">

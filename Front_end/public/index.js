@@ -45,23 +45,25 @@ ws.addEventListener('message', (msg) => {
 });
 
 let maxVal = 1000;
-let windowWidth = window.screen.width;
-let width = 2;
+let windowWidth = canvas.width;
+let width = 5;
 
 let interval = setInterval(() => {
     // data.push(Math.random() * 100);
     // console.log(index % 100, data[index]);
-    ctx.clearRect((index % (windowWidth / width)) * width, -1000, 30, 2000);
-    if((index+1) % (windowWidth / width) === 0) {
+    ctx.clearRect((index % Math.floor(windowWidth / width)) * width, -1000, 30, 2000);
+    if((index+1) % Math.floor(windowWidth / width) == 0) {
         ctx.clearRect(-10, -1000, 30, 2000);
         // data.push(Math.random() * 100);
         index++;
     }
     if(data[index] > maxVal) maxVal = data[index];
 
+    ctx.strokeStyle = "green"; 
+    ctx.lineWidth = 3; 
     ctx.beginPath();
-    ctx.moveTo((index % (windowWidth / width)) * width, maxVal - data[index]);
-    ctx.lineTo(((index+1) % (windowWidth / width)) * width, maxVal - data[index + 1]);
+    ctx.moveTo((index % Math.floor(windowWidth / width)) * width, maxVal - data[index]);
+    ctx.lineTo(((index+1) % Math.floor(windowWidth / width)) * width, maxVal - data[index + 1]);
     ctx.stroke();
     index++;
 }, 10);
@@ -75,8 +77,8 @@ function drawGrid() {
     let ctx = canvas.getContext("2d");
     const dpr = window.devicePixelRatio;
     // let mmSize = window.screen.width / 34.02 / 10 * width;
-    let mmSize = canvas.width / 34.02 / 5; //34.02cm is just my const width of the laptop. It varies on each device
-    ctx.strokeStyle = "red";  
+    let mmSize = canvas.width / 17.02 / 5; //34.02cm is just my const width of the laptop. It varies on each device
+    ctx.strokeStyle = "grey";  
 
     for(let i=0; i < 200; i++) {
         if(i % 5 === 0) ctx.lineWidth = 1;
