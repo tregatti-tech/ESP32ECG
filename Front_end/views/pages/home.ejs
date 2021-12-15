@@ -1,23 +1,23 @@
 <div id="root">
     <!-- <canvas id="holter"></canvas> -->
-    <div id="ecg-plot" class="container-fluid" style="margin-top: 50px; margin-left: 100px;">
+    <div id="ecg-plot" class="container-fluid" style="margin-top: 30px; margin-left: 100px;">
         <div class="col">
           <h1>ECG <i class="fas fa-diagnoses"></i></h1>
           <p>Showing qrs complexes through timeline</p>      
           <p>Heart rate and SpO2</p>      
         </div>
           <div class="row">
-            <div id="real-time-plot" class="col-sm-6" style="border-right: 1px solid; border-color: green; height: 500px;">
+            <div id="real-time-plot" class="col-sm-6" style="background-color: rgb(244, 238, 245); border-right: 1px solid; border-color: black; height: 320px;">
               <canvas id="grid"></canvas> 
               <canvas id="holter"></canvas> 
             </div>
-            <div id="extra-info" class="col-sm-2" style="background-color: rgb(50, 61, 61); color: green;">   
+            <div id="extra-info" class="col-sm-2" style="background-color: rgb(244, 238, 245);; color: black;">   
               <div class="container">
                 <p>Heart rate</p>
                   <p class="heart">
                     <i class="fa fa-heart fa-2x fa-beat"></i>
                 </p>
-                <p style="height: 50 px; border-bottom: 1px solid; border-color: green;"></p>
+                <p style="height: 50 px; border-bottom: 1px solid; border-color: black;"></p>
                 <!-- <div id="saturation" class="row-sm-2" style="color: green;">SpO2</div> -->
                 <p>SpO2 %</p>
                   <div class="progress">

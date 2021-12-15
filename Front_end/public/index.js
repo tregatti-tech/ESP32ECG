@@ -9,23 +9,25 @@ let data = [0], index = 0;
 // for production we should use wss, but for development ws is fine 
 const ws = new WebSocket('ws://localhost:3000');
 
-const yValues = [];
-
 ws.addEventListener('open', () => {
     console.log('We are connected!');
 
     // ws.send('Hey! How is it going?');
 });
 
-
 let cnt = 0;
 let stop = false;
 let realTimePlot = null;
 
+// let msgCnt = 0;
 ws.addEventListener('message', (msg) => {
+    // msgCnt++;
     const parsedData = JSON.parse(msg.data);
     // console.log(parsedData);
-    data.push(+parsedData.A);
+    parsedData.map(el => {
+        data.push(+el.A);
+    })
+    // console.log(msgCnt + ' ' + parsedData.length);
 });
 
 let maxVal = 1000;

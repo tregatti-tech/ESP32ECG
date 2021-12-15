@@ -14,7 +14,7 @@ app.set('view engine', 'ejs');
 app.set('layout', './layout');
 
 app.get('/', (req, res) => {
-  utils.renderWithLayout(res, 'home', 'HOME');
+  utils.renderWithLayout(res, 'home', 'ECG Visualization');
 });
 
 app.listen(PORT, () => {
