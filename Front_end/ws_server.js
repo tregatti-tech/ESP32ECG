@@ -34,7 +34,14 @@ wss.on('connection', (ws) => {
     }, 4000);
 
     ws.on('message', (data) => {
-        console.log(`New message from client: ${data}.`);
+        // console.log(data);
+        fs.writeFile(path.join(__dirname, 'data', 'record.wav'), data, err => {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log('File was written successfully!');
+            }
+        });
     })
 
     ws.on('close', () => {
