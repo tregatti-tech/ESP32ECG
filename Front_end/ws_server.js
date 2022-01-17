@@ -31,7 +31,7 @@ wss.on('connection', (ws) => {
     setInterval(() => {
         i += 1000;
         ws.send(JSON.stringify(csvData.slice(i, i + 1000)));
-    }, 1000);
+    }, 4000);
 
     ws.on('message', (data) => {
         console.log(`New message from client: ${data}.`);

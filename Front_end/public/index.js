@@ -61,7 +61,7 @@ let interval = setInterval(() => {
     ctx.lineTo(((index+1) % Math.floor(windowWidth / width)) * width, maxVal - data2);
     ctx.stroke();
     index++;
-}, 10);
+}, 4);
 
 drawGrid();
 
