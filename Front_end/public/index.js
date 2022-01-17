@@ -90,3 +90,37 @@ function drawGrid() {
         ctx.stroke();
     }
 }
+
+const recordBtn = document.getElementById('rec-button');
+
+let stopRecordingState = false;
+const signalStream = canvas.captureStream(30);
+const mediaRecorder = new MediaRecorder(signalStream);
+
+recordBtn.addEventListener('click', () => {
+    if (!stopRecordingState) {
+        // console.log('Recording...');
+        let chunks = [];
+        mediaRecorder.ondataavailable = function(e) {
+        chunks.push(e.data);
+        };
+    
+        mediaRecorder.onstop = function(e) {
+            let blob = new Blob(chunks, { 'type' : 'audio/wav' });
+            if(ws.readyState == 1) {
+                ws.send(blob);
+            }
+            chunks = [];
+        };
+        mediaRecorder.ondataavailable = function(e) {
+            chunks.push(e.data);
+        };
+    
+        mediaRecorder.start();
+        stopRecordingState = true;
+    } else {
+        mediaRecorder.stop(); 
+        // console.log('Button clicked for stop!');
+        stopRecordingState = false;
+    }
+})
