@@ -148,6 +148,17 @@ var svg = d3.select("#real-time-plot").append("svg")
     .attr("transform", "rotate(-90)")
     .attr("fill", "#F00");
 
+    
+  svg.append("g")
+    .selectAll("circle")
+    .data(data).enter()
+    .append("g")
+    .attr("class", "circle")
+    .append("circle")
+    .attr("cx", d => xScale(d.time))
+    .attr("cy", d => yScale(d.value))
+    .attr("r", 4);
+
 // svg.append('path')
 //   .attr('class', 'line')
 //   .attr('d', line(data));
@@ -157,25 +168,54 @@ var svg = d3.select("#real-time-plot").append("svg")
 
 let index = 0;
 let tempData = [], tempData1 = [], tempData2 = [];
+let filteredData = [];
+let SLT = 1, ATP, ATN, lastRpeak = 0;
+let RRCount = 0;
+const SLTMIN = 1, ATPMIN = 100;
 for(let i=0; i < 1000; i++) {
-  tempData.push({time: i, value: 800});
+  tempData.push({time: i, value: 0});
 }
 let interval = setInterval(() => {
-    console.log("UPDATE")
+    // console.log("UPDATE")
   
     //FILTRATION
-    let data1=0, data2=0;
+    // let D = 10, N = 19;
+    // let data1=NaN, suma = 0;
+    // for(let i = index - D * (N - 1) / 2; i <= index + D * (N - 1) / 2; i += D) {
+    //   suma += data[i];
+    // }
+    // suma /= N;
+    // data1 = data[index] - suma;
+    // console.log(index - D * (N - 1) / 2, index, index + D * (N - 1) / 2);
+
+    let data1 = 0, data2 = 0;
+    
     for(let i=0; i < 5; i++) {
-        data1 += data[index + i];
-        data2 += data[index + i + 1];
+      data1 += data[index + i];
+      data2 += data[index + i +  1];
     }
     data1 /= 5;
     data2 /= 5;
     if(!Number.isNaN(data1))
     {
       tempData[index % 1000] = {time: index % 1000, value: data1};
-      tempData2 = tempData.slice((index+20) % 1000);
       tempData1 = tempData.slice(0, (index+1) % 1000);
+      tempData2 = tempData.slice((index+20) % 1000);
+    }
+
+    for(let j=0; j <= 5; j++)
+    {
+      data1=0; data2 = 0;
+      for(let i=0; i < 5; i++) {
+          data1 += data[index + i + j];
+          data2 += data[index + i + j +  1];
+      }
+      data1 /= 5;
+      data2 /= 5;
+      if(!Number.isNaN(data1))
+      {
+        filteredData[index + j] = data1;
+      }
     }
 
 
@@ -185,7 +225,8 @@ let interval = setInterval(() => {
 
   var yScale = d3.scaleLinear()
     // .domain(d3.extent(tempData, d => d.value))
-    .domain([700, 900])
+    // .domain([-20, 50])
+    .domain([800, 900])
     .range([height-margin, 0]);
   
   var line = d3.line()
@@ -209,5 +250,76 @@ let interval = setInterval(() => {
   svg.select(".y.axis")
     .call(yAxis);
 
+
+    //QRS DETECTION
+    
+    if (index >= 5) {
+      let countPositive = 0;
+      // console.log(countPositive);
+      // Needed only in case of possible RPeak, but calculated here
+      let ECGSlope = 0;
+      let sumBckw = 0;
+      let sumFwd = 0;
+      for (let i = 1; i <= 5; i++) {
+        const valbckw = filteredData[index - i];
+        const valfwd = filteredData[index + i];
+        const checkValue = (filteredData[index] - valbckw)*(filteredData[index]-valfwd);
+
+        if (checkValue > 0) {
+          countPositive++;
+        }
+
+        sumBckw += Math.abs(filteredData[index] - valbckw);
+        sumFwd += Math.abs(filteredData[index] - valfwd);
+        ECGSlope = sumBckw + sumFwd;
+        
+      }
+
+      if(index - lastRpeak >= 60)
+        SLT = SLT - SLT / 128;
+        
+      if (countPositive == 5) { // more conditions needed... use SLTValue (ECGSlope for current smaple) and more
+      // detectedRPeaks.push({
+      // name: 'RPeak',
+      // valueR: data[index]
+      // });
+        // console.log('Possible RPeak detected...!');
+
+        if(ECGSlope > SLT) {
+          RRCount++;
+
+          // console.log(index % 1000, filteredData[index]);
+          svg.append('circle')
+            .attr('cx', xScale(index % 1000))
+            .attr('cy', yScale(filteredData[index]))
+            .attr('r', 2)
+            .attr('stroke', 'black');
+
+          SLT = ECGSlope;
+          if(filteredData[index] > 0)
+            ATP = filteredData[index];
+          else
+            ATN = filteredData[index];
+          lastRpeak = index;
+        }
+        else if(ECGSlope > SLT / 2 && filteredData[index] > 2 * ATP) {
+
+        }
+        else if(ECGSlope > SLT / 2 && filteredData[index] < 2 * ATN) {
+          
+        }
+
+      if(SLT <= SLTMIN)
+        SLT = ECGSlope;
+    }
+  }
+
+  if(index % 1500 === 0) {
+    console.log(RRCount * 10);
+    RRCount = 0;
+  }
+  if(index % 1000 === 0) 
+    svg.selectAll("circle")
+      .remove();
     index++;
 }, 4);
