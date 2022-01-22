@@ -314,8 +314,8 @@ let interval = setInterval(() => {
     }
   }
 
-  if(index % 1500 === 0) {
-    console.log(RRCount * 10);
+  if(index % 1000 === 0) {
+    console.log(((RRCount/4)*60));
     RRCount = 0;
   }
   if(index % 1000 === 0) 
