@@ -77,3 +77,8 @@ a{
       box-shadow: 0px 0px 3px 6px rgba(173,0,0,0);
     }
   }
+
+  #low-pass-filter-icon {
+    color: green;
+    cursor: pointer;
+  }
