@@ -1,4 +1,5 @@
 import * as d3 from 'https://unpkg.com/d3?module'
+import lowPassFilter from './lowPassFilter.js'
 console.log(d3.event)
 
 
@@ -28,23 +29,22 @@ function idx(i, n)
 let cnt = 0;
 let stop = false;
 let realTimePlot = null;
-let filteredData = [];
+let filteredData = [], filteredLowPassData = [];
 
-// let msgCnt = 0;
 ws.addEventListener('message', (msg) => {
-    // msgCnt++;
     const parsedData = JSON.parse(msg.data);
     // console.log(parsedData);
     parsedData.map((el, index) => {
 
-        let D = 10, N = 39;
+        let D = 5, N = 17;
         let data1=NaN, suma = 0;
         for(let i = index - D * (N - 1) / 2; i <= index + D * (N - 1) / 2; i += D) {
           suma += +parsedData[idx(i, 1000)];
         }
         suma /= N;
-        data1 =  (+parsedData[index] - suma);
+        data1 = -(+parsedData[index] - suma);
         filteredData.push(data1);
+
     })
     
 
@@ -59,6 +59,8 @@ ws.addEventListener('message', (msg) => {
         filteredData[j] = avg;
     }
 
+    filteredLowPassData.push(...lowPassFilter(filteredData));
+    console.log(filteredLowPassData)
 });
 
   d3
@@ -189,7 +191,22 @@ var svg = d3.select("#real-time-plot").append("svg")
 //   .attr('class', 'line')
 //   .attr('d', line(data));
 
+function RPeak() {
+  RRCount++;
 
+  svg.append('circle')
+    .attr('cx', xScale(index % 1000))
+    .attr('cy', yScale(filteredData[index]))
+    .attr('r', 2)
+    .attr('stroke', 'black');
+
+  SLT = ECGSlope;
+  if(filteredData[index] > 0)
+    ATP = filteredData[index];
+  else
+    ATN = filteredData[index];
+  lastRpeak = index;
+}
 
 
 let index = 0;
@@ -198,55 +215,31 @@ let SLT = 1, ATP, ATN, lastRpeak = 0;
 let RRCount = 0;
 const SLTMIN = 1, ATPMIN = 100;
 
+let lowPassButton = document.getElementById("low-pass-filter-icon");
+let lowPass = false;
+
+lowPassButton.addEventListener('click', () => {
+  lowPass = !lowPass;
+})  
+
 for(let i=0; i < 1000; i++) {
   tempData.push({time: index % 1000, value: 0});
 }
 
 let interval = setInterval(() => {
     // console.log("UPDATE")
-  
-    //FILTRATION
-    // let D = 5, N = 19;
-    // let data1=NaN, suma = 0;
-    // for(let i = index - D * (N - 1) / 2; i <= index + D * (N - 1) / 2; i += D) {
-    //   suma += data[i];
-    // }
-    // suma /= N;
-    // data1 = - (data[index] - suma);
-    // data1 = data [index] - 
-    //   (
-    //     data [index - 40] 
-    //   + data [index - 35 ] 
-    //   + data [index - 30 ] 
-    //   + data [index - 25 ] 
-    //   + data [index - 20] 
-    //   + data [index - 15] 
-    //   + data [index - 10] 
-    //   + data [index -  5] 
-    //   + data [index] 
-    //   + data [index +  5] 
-    //   + data [index + 10]
-    //   + data [index - 15] 
-    //   + data [index + 20]
-    //   + data [index + 25]
-    //   + data [index + 30]
-    //   + data [index + 35]
-    //   + data [index + 40]
-    //   )/17;
-
-    // console.log(index - D * (N - 1) / 2, index, index + D * (N - 1) / 2);
 
     let data2 = 0;
+
     
-    // for(let i=0; i < 5; i++) {
-    //   data1 += data[index + i];
-    //   data2 += data[index + i +  1];
-    // }
-    // data1 /= 5;
-    // data2 /= 5;
-    if(filteredData[index] !== undefined)
-    {
-      tempData[index % 1000] = {time: index % 1000, value: filteredData[index]};
+    if(filteredData[index] !== undefined) {
+      
+      if(lowPass) {
+        tempData[index % 1000] = {time: index % 1000, value: filteredLowPassData[index]};
+      }
+      else
+        tempData[index % 1000] = {time: index % 1000, value: filteredData[index]};
+
       tempData1 = tempData.slice(0, (index+1) % 1000);
       tempData2 = tempData.slice((index+20) % 1000);
     }
@@ -310,7 +303,11 @@ let interval = setInterval(() => {
       }
 
       if(index - lastRpeak >= 60)
+      {
         SLT = SLT - SLT / 128;
+        ATP--;
+        ATN++;
+      }
         
       if (countPositive == 5) { // more conditions needed... use SLTValue (ECGSlope for current smaple) and more
       // detectedRPeaks.push({
@@ -319,10 +316,13 @@ let interval = setInterval(() => {
       // });
         // console.log('Possible RPeak detected...!');
 
-        if(ECGSlope > SLT && index - lastRpeak >= 60) {
+        let maxPossibleRVal = Math.max(...filteredData.slice(index, index + 60).map(Math.abs));
+        
+        if(index - lastRpeak >= 60 && maxPossibleRVal === Math.abs(filteredData[index]))
+        if(ECGSlope > SLT) {
+          
           RRCount++;
 
-          // console.log(index % 1000, filteredData[index]);
           svg.append('circle')
             .attr('cx', xScale(index % 1000))
             .attr('cy', yScale(filteredData[index]))
@@ -337,10 +337,38 @@ let interval = setInterval(() => {
           lastRpeak = index;
         }
         else if(ECGSlope > SLT / 2 && filteredData[index] > 2 * ATP) {
+          
+          RRCount++;
 
+          svg.append('circle')
+            .attr('cx', xScale(index % 1000))
+            .attr('cy', yScale(filteredData[index]))
+            .attr('r', 2)
+            .attr('stroke', 'black');
+
+          SLT = ECGSlope;
+          if(filteredData[index] > 0)
+            ATP = filteredData[index];
+          else
+            ATN = filteredData[index];
+          lastRpeak = index;
         }
         else if(ECGSlope > SLT / 2 && filteredData[index] < 2 * ATN) {
           
+          RRCount++;
+
+          svg.append('circle')
+            .attr('cx', xScale(index % 1000))
+            .attr('cy', yScale(filteredData[index]))
+            .attr('r', 2)
+            .attr('stroke', 'black');
+
+          SLT = ECGSlope;
+          if(filteredData[index] > 0)
+            ATP = filteredData[index];
+          else
+            ATN = filteredData[index];
+          lastRpeak = index;
         }
 
       if(SLT <= SLTMIN)
