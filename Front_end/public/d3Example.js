@@ -1,5 +1,5 @@
 import * as d3 from 'https://unpkg.com/d3?module'
-console.log(d3.event)
+// console.log(d3.event)
 
 
 var width = 500;
@@ -24,15 +24,16 @@ let cnt = 0;
 let stop = false;
 let realTimePlot = null;
 
-// let msgCnt = 0;
 ws.addEventListener('message', (msg) => {
-    // msgCnt++;
-    const parsedData = JSON.parse(msg.data);
-    // console.log(parsedData);
-    parsedData.map(el => {
-        data.push(+el.A);
-    })
-    console.log(data);
+  const receivedData = JSON.parse(msg.data);
+
+  // console.log('New message\n' + Object.keys(receivedData).length);
+
+  for (const property in receivedData) {
+    // console.log(receivedData[property]);
+    data.push(+receivedData[property]);
+  }
+  // console.log(data);
 });
 
   d3
