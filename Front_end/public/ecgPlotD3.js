@@ -1,6 +1,7 @@
 import * as d3 from 'https://unpkg.com/d3?module'
 import lowPassFilter from './lowPassFilter.js'
-console.log(d3.event)
+// console.log(d3.event);
+const heartBeatValueElement = document.querySelector('#heart-beat-value');
 
 
 var width = 500;
@@ -377,7 +378,9 @@ let interval = setInterval(() => {
   }
 
   if(index % 1000 === 0) {
-    console.log(((RRCount/4)*60));
+    const heartBeat = ((RRCount / 4) * 60);
+    console.log(heartBeat);
+    heartBeatValueElement.innerText = heartBeat;
     RRCount = 0;
   }
   if(index % 1000 === 0) 
