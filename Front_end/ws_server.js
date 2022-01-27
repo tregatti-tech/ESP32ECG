@@ -9,37 +9,28 @@ const wss = new WebSocket.Server({ port: PORT });
 
 const csvData = [];
 
-const rStream = fs.createReadStream(path.join(__dirname, 'data', 'ws.csv'), { encoding: 'utf-8' });
+const rStream = fs.createReadStream(path.join(__dirname, 'data', 'data2.csv'), { encoding: 'utf-8' });
 rStream
-        .pipe(csv({ headers: false }))
-        .on('data', dtChunk => { 
-            csvData.push(dtChunk);
-            // console.log(dtChunk);
-            // console.log(Object.keys(dtChunk).length);
-        })
+        .pipe(csv())
+        .on('data', dtChunk => csvData.push(dtChunk))
         .on('end', () => console.log('End of file...'));
 
 // listen for connection from the clients 
 wss.on('connection', (ws) => {
     console.log('Client was connected.');
 
+    // const rs = fs.createReadStream(path.join(__dirname, 'data', 'data2.csv'), { encoding: 'utf-8' }); 
+    // rs
+    //     .pipe(csv())
+    //     .on('data', (dataChunk) => ws.send(JSON.stringify(dataChunk)))
+    //     .on('end', () => console.log('CSV File Exhausted...'));
+
     let i = 0;
 
-    // ws.send(JSON.stringify(csvData.slice(0, 1000))); // it was for old data (data2.csv)
-
-    // every row we know that is 4s, so time duration in seconds is number of rows mult. by 4
-    const sendDataInterval = setInterval(() => {
-        // i += 1000;
-        // ws.send(JSON.stringify(csvData.slice(i, i + 1000)));
-        if (i >= csvData.length) {
-            console.log('TIMEOUT...!');
-            clearInterval(sendDataInterval);
-        } else {
-            ws.send(JSON.stringify(csvData[i]));
-            // console.log(csvData[i]);
-            // console.log(Object.keys(csvData[i]).length);
-            i++;
-        }
+    ws.send(JSON.stringify(csvData.slice(0, 1000)));
+    setInterval(() => {
+        i += 1000;
+        ws.send(JSON.stringify(csvData.slice(i, i + 1000)));
     }, 4000);
 
     ws.on('message', (data) => {
