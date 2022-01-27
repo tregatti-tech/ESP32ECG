@@ -54,6 +54,16 @@ a{
     outline: none;
   }
 
+  #rec-button {
+    transition-property: background-color;
+    -o-transition-duration: 1s;
+    transition-duration: 1s;
+  } 
+
+  #rec-button:hover {
+    background-color: red;
+  } 
+
   .notRec{
     background-color: darkred;
   }
@@ -76,4 +86,21 @@ a{
     90%{
       box-shadow: 0px 0px 3px 6px rgba(173,0,0,0);
     }
+  }
+
+  #low-pass-filter-icon {
+    color: green;
+    cursor: pointer;
+  }
+
+  #low-pass-filter-icon {
+    color: green;
+    cursor: pointer;
+    transition-property: color;
+    -o-transition-duration: 0.5;
+    transition-duration: 0.5s;
+  }
+
+  #low-pass-filter-icon:hover {
+    color: rgb(19, 231, 19);
   }
