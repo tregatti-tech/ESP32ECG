@@ -20,19 +20,45 @@ ws.addEventListener('open', () => {
     // ws.send('Hey! How is it going?');
 });
 
+function idx(i, n)
+{
+ return ((i % n) + n) % n;
+}
+
 let cnt = 0;
 let stop = false;
 let realTimePlot = null;
+let filteredData = [];
 
 // let msgCnt = 0;
 ws.addEventListener('message', (msg) => {
     // msgCnt++;
     const parsedData = JSON.parse(msg.data);
     // console.log(parsedData);
-    parsedData.map(el => {
-        data.push(+el.A);
+    parsedData.map((el, index) => {
+
+        let D = 10, N = 39;
+        let data1=NaN, suma = 0;
+        for(let i = index - D * (N - 1) / 2; i <= index + D * (N - 1) / 2; i += D) {
+          suma += +parsedData[idx(i, 1000)];
+        }
+        suma /= N;
+        data1 =  (+parsedData[index] - suma);
+        filteredData.push(data1);
     })
-    console.log(data);
+    
+
+    for(let j=filteredData.length - 1000; j < filteredData.length - 5; j++)
+    {
+      let avg=0;
+      for(let i=0; i < 5; i++) {
+        avg += filteredData[i + j];
+      }
+      avg /= 5;
+      if(!Number.isNaN(avg))
+        filteredData[j] = avg;
+    }
+
 });
 
   d3
@@ -168,55 +194,63 @@ var svg = d3.select("#real-time-plot").append("svg")
 
 let index = 0;
 let tempData = [], tempData1 = [], tempData2 = [];
-let filteredData = [];
 let SLT = 1, ATP, ATN, lastRpeak = 0;
 let RRCount = 0;
 const SLTMIN = 1, ATPMIN = 100;
+
 for(let i=0; i < 1000; i++) {
-  tempData.push({time: i, value: 0});
+  tempData.push({time: index % 1000, value: 0});
 }
+
 let interval = setInterval(() => {
     // console.log("UPDATE")
   
     //FILTRATION
-    // let D = 10, N = 19;
+    // let D = 5, N = 19;
     // let data1=NaN, suma = 0;
     // for(let i = index - D * (N - 1) / 2; i <= index + D * (N - 1) / 2; i += D) {
     //   suma += data[i];
     // }
     // suma /= N;
-    // data1 = data[index] - suma;
+    // data1 = - (data[index] - suma);
+    // data1 = data [index] - 
+    //   (
+    //     data [index - 40] 
+    //   + data [index - 35 ] 
+    //   + data [index - 30 ] 
+    //   + data [index - 25 ] 
+    //   + data [index - 20] 
+    //   + data [index - 15] 
+    //   + data [index - 10] 
+    //   + data [index -  5] 
+    //   + data [index] 
+    //   + data [index +  5] 
+    //   + data [index + 10]
+    //   + data [index - 15] 
+    //   + data [index + 20]
+    //   + data [index + 25]
+    //   + data [index + 30]
+    //   + data [index + 35]
+    //   + data [index + 40]
+    //   )/17;
+
     // console.log(index - D * (N - 1) / 2, index, index + D * (N - 1) / 2);
 
-    let data1 = 0, data2 = 0;
+    let data2 = 0;
     
-    for(let i=0; i < 5; i++) {
-      data1 += data[index + i];
-      data2 += data[index + i +  1];
-    }
-    data1 /= 5;
-    data2 /= 5;
-    if(!Number.isNaN(data1))
+    // for(let i=0; i < 5; i++) {
+    //   data1 += data[index + i];
+    //   data2 += data[index + i +  1];
+    // }
+    // data1 /= 5;
+    // data2 /= 5;
+    if(filteredData[index] !== undefined)
     {
-      tempData[index % 1000] = {time: index % 1000, value: data1};
+      tempData[index % 1000] = {time: index % 1000, value: filteredData[index]};
       tempData1 = tempData.slice(0, (index+1) % 1000);
       tempData2 = tempData.slice((index+20) % 1000);
     }
 
-    for(let j=0; j <= 5; j++)
-    {
-      data1=0; data2 = 0;
-      for(let i=0; i < 5; i++) {
-          data1 += data[index + i + j];
-          data2 += data[index + i + j +  1];
-      }
-      data1 /= 5;
-      data2 /= 5;
-      if(!Number.isNaN(data1))
-      {
-        filteredData[index + j] = data1;
-      }
-    }
 
 
   var xScale = d3.scaleLinear()
@@ -224,9 +258,9 @@ let interval = setInterval(() => {
     .range([0, width-margin]);
 
   var yScale = d3.scaleLinear()
-    // .domain(d3.extent(tempData, d => d.value))
-    // .domain([-20, 50])
-    .domain([800, 900])
+    .domain(d3.extent(tempData, d => d.value))
+    .domain([-20, 20])
+    // .domain([800, 900])
     .range([height-margin, 0]);
   
   var line = d3.line()
@@ -285,7 +319,7 @@ let interval = setInterval(() => {
       // });
         // console.log('Possible RPeak detected...!');
 
-        if(ECGSlope > SLT) {
+        if(ECGSlope > SLT && index - lastRpeak >= 60) {
           RRCount++;
 
           // console.log(index % 1000, filteredData[index]);
@@ -314,8 +348,8 @@ let interval = setInterval(() => {
     }
   }
 
-  if(index % 1500 === 0) {
-    console.log(RRCount * 10);
+  if(index % 1000 === 0) {
+    console.log(((RRCount/4)*60));
     RRCount = 0;
   }
   if(index % 1000 === 0) 

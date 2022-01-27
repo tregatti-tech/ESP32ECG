@@ -2,18 +2,26 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser'); 
+const { json } = require('express/lib/response');
+const { clearInterval } = require('timers');
 
 const PORT = process.env.PORT || 3000
 
 const wss = new WebSocket.Server({ port: PORT });
 
 const csvData = [];
+let jsonData = [];
 
 const rStream = fs.createReadStream(path.join(__dirname, 'data', 'data2.csv'), { encoding: 'utf-8' });
 rStream
         .pipe(csv())
         .on('data', dtChunk => csvData.push(dtChunk))
         .on('end', () => console.log('End of file...'));
+
+fs.readFile(path.join(__dirname, 'data', 'ws.data'), 'utf8', function (err, data) {
+    if (err) throw err;
+    jsonData = JSON.parse(data);
+  })
 
 // listen for connection from the clients 
 wss.on('connection', (ws) => {
@@ -26,11 +34,14 @@ wss.on('connection', (ws) => {
     //     .on('end', () => console.log('CSV File Exhausted...'));
 
     let i = 0;
+    // console.log(jsonData);
 
-    ws.send(JSON.stringify(csvData.slice(0, 1000)));
-    setInterval(() => {
-        i += 1000;
-        ws.send(JSON.stringify(csvData.slice(i, i + 1000)));
+    ws.send(JSON.stringify(jsonData[i]));
+    let handler = setInterval(() => {
+        i++;
+        if(i < jsonData.length)
+            ws.send(JSON.stringify(jsonData[i]));
+        else clearInterval(handler);
     }, 4000);
 
     ws.on('message', (data) => {
