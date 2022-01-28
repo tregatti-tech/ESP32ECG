@@ -1,7 +1,6 @@
 const a = [-1.374, 0.5278];
 const b = [0.0384, 0.0768, 0.0384];
 
-
 function idx(i, n)
 {
  return ((i % n) + n) % n;
