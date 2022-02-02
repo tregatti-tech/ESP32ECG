@@ -17,8 +17,7 @@ const CombFilter = (incomingData) => {
         for(let i = index - D * (N - 1) / 2; i <= index + D * (N - 1) / 2; i += D) {
           suma += +incomingData[idx(i, 1000)];
         }
-        suma /= N;
-        data1 = -(+incomingData[index] - suma);
+        data1 = 255 - 128 - (+incomingData[index] - suma / N);
         filteredData.push(data1);
 
     };

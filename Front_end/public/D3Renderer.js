@@ -41,64 +41,61 @@ class D3Renderer {
             .attr("transform", `translate(${margin}, ${margin})`);
 
 
-
-        function gridData() {
-        var data = new Array();
-        var xpos = 1; //starting xpos and ypos at 1 so the stroke will show when we make the grid below
-        var ypos = 1;
-        var width = 18;
-        var height = 18;
-        var click = 0;
-        
-        // iterate for rows	
-        for (var row = 0; row <= 25; row++) {
-            data.push( new Array() );
-            
-            // iterate for cells/columns inside rows
-            for (var column = 0; column <= 25; column++) {
-            data[row].push({
-                x: xpos,
-                y: ypos,
-                width: width,
-                height: height
-            })
-            // increment the x position. I.e. move it over by 50 (width variable)
-            xpos += width;
-            }
-            // reset the x position after a row is complete
-            xpos = 1;
-            // increment the y position for the next row. Move it down 50 (height variable)
-            ypos += height;	
-        }
-        return data;
-        }
-
-        var grid = gridData();	
-        
-        var row = this.svg.selectAll(".row")
-            .data(grid)
-            .enter().append("g")
-            .attr("class", "row");
-        
-        var column = row.selectAll(".square")
-            .data(function(d) { return d; })
-            .enter().append("rect")
-            .attr("class","square")
-            .attr("x", function(d) { return d.x; })
-            .attr("y", function(d) { return d.y; })
-            .attr("width", function(d) { return d.width; })
-            .attr("height", function(d) { return d.height; })
-            .style("fill", "#f5f0f5")
-            .style("stroke", "#ff0000")
-
         /* Scale */
         this.xScale = d3.scaleLinear()
             .domain([0, 1000])
             .range([0, width-margin]);
 
         this.yScale = d3.scaleLinear()
-            .domain([-20,20])
+            .domain([0, 1000])
             .range([height-margin, 0]);
+
+
+        
+        // add the X gridlines
+        this.svg.append("g")			
+            .attr("class", "gridSmall")
+            .attr("stroke-width", 0.5)
+            .attr("transform", "translate(0," + height + ")")
+            .call(make_x_gridlines(this.xScale)
+                .ticks(100)
+                .tickSize(-height)
+                .tickFormat("")
+            )
+
+        // add the Y gridlines
+        this.svg.append("g")			
+            .attr("class", "gridSmall")
+            .attr("stroke-width", 0.5)
+            .call(make_y_gridlines(this.yScale)
+                .ticks(70)
+                .tickSize(-width)
+                .tickFormat("")
+            )
+
+        // add the X gridlines
+        this.svg.append("g")			
+            .attr("class", "grid")
+            .attr("stroke-width", 1.5)
+            .attr("transform", "translate(0," + height + ")")
+            .call(make_x_gridlines(this.xScale)
+                .ticks(20)
+                .tickSize(-height)
+                .tickFormat("")
+            )
+
+        // add the Y gridlines
+        this.svg.append("g")			
+            .attr("class", "grid")
+            .attr("stroke-width", 1.5)
+            .call(make_y_gridlines(this.yScale)
+                .ticks(14)
+                .tickSize(-width)
+                .tickFormat("")
+            )
+
+            
+
 
         /* Add line into SVG */
         var line = d3.line()
@@ -157,6 +154,10 @@ class D3Renderer {
             this.tempData1 = this.tempData.slice(0, (index+1) % 1000);
             this.tempData2 = this.tempData.slice((index+20) % 1000);
         }
+        
+        this.yScale = d3.scaleLinear()
+            .domain(d3.extent(filteredData))
+            .range([height-margin, 0]);
 
         var line = d3.line()
             .x(d => this.xScale(d.time))

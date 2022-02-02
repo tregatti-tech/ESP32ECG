@@ -1,9 +1,8 @@
 import D3Renderer from './D3Renderer.js';
 import {CombFilter, AverageFilter, lowPassFilter} from './Filtration.js'
+import saveRecording from './Recording.js';
 // console.log(d3.event);
 const heartBeatValueElement = document.querySelector('#heart-beat-value');
-
-let data = [];
 
 // for production we should use wss, but for development ws is fine 
 const ws = new WebSocket('ws://localhost:3000');
@@ -43,11 +42,24 @@ lowPassButton.addEventListener('click', () => {
 })  
 
 
+const recordBtn = document.getElementById('rec-button');
+let recording = false;
+let recordingData = [];
+
+recordBtn.addEventListener('click', () => {
+  recording = !recording;
+  if(!recording) saveRecording(recordingData);
+  else recordingData = [];
+})
+
+
 let renderer = new D3Renderer();
 
 let interval = setInterval(() => {
     // console.log("UPDATE")
     renderer.update(index, filteredData, filteredLowPassData, lowPass);
+
+    if(recording) recordingData.push(Math.round(filteredData[index] * 1000) / 1000);
 
     
     //QRS DETECTION
@@ -90,7 +102,7 @@ let interval = setInterval(() => {
 
         let maxPossibleRVal = Math.max(...filteredData.slice(index, index + 60).map(Math.abs));
         
-        if(index - lastRpeak >= 60 && maxPossibleRVal === Math.abs(filteredData[index]))
+        if(maxPossibleRVal === Math.abs(filteredData[index]))
         if(ECGSlope > SLT) {
           
           RRCount++;
