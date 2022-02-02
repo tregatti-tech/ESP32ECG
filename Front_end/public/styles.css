@@ -4,13 +4,13 @@ path.line1,path.line2,circle
     stroke: #000;
 }
 
-.grid
+.gridX, .gridY
 {
   fill: none;
   color: #f00;
 }
 
-.gridSmall
+.gridSmallX, .gridSmallY
 {
   fill: none;
   color: rgb(255, 111, 111);
@@ -25,11 +25,16 @@ path.line1,path.line2,circle
     left: 0;
 }
 
+#root {
+  overflow: hidden;
+}
+
 #real-time-plot {
     align-content: center;
     background-color: rgba(255, 255, 255, 0.87);
     position: relative;
-    overflow: hidden;
+    overflow-x: scroll;
+    overflow-y: hidden;
 };
 
 a{

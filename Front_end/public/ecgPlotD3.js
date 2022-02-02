@@ -52,6 +52,25 @@ recordBtn.addEventListener('click', () => {
   else recordingData = [];
 })
 
+const fileSelector = document.getElementById('open-rec-button');
+let recordingInput = [];
+let live = true;
+
+fileSelector.addEventListener('change', (event) => {
+  const fileList = event.target.files;
+  
+  const reader = new FileReader();
+  reader.addEventListener('load', (event) => {
+    recordingInput = JSON.parse(event.target.result);
+    live = false;
+    clearInterval(interval);
+    renderer.clearAll();
+
+    renderer.drawPreviousData(recordingInput);
+  });
+
+  reader.readAsText(fileList[0]);
+});
 
 let renderer = new D3Renderer();
 
