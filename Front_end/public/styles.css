@@ -1,123 +1,233 @@
-path.line1,path.line2,circle
-{
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+path.line1, path.line2, circle {
     fill: none;
     stroke: #000;
 }
 
-.gridX, .gridY
-{
-  fill: none;
-  color: #f00;
+body {
+    font-family: 'Poppins', sans-serif, Helvetica;
+    line-height: 1.5;
+    color: #333;
+    /* background-color: #DFCFBE; */
+    background-color: beige;
 }
 
-.gridSmallX, .gridSmallY
-{
-  fill: none;
-  color: rgb(255, 111, 111);
+h1, h4, h5 {
+    /* margin-top: 3px; */
+    margin-bottom: 12px;
 }
 
-#holter, #grid
-{ 
-    position: absolute;
-    width: 100%;
-    /* height: 100px; */
-    top: 0;
-    left: 0;
-}
+#whole-module{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: baseline;
+    /* max-width: 1100px; */
+    margin: 50px auto;
+    padding: 0 30px;
 
-#root {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 #real-time-plot {
     align-content: center;
     background-color: rgba(255, 255, 255, 0.87);
-    position: relative;
+    position: relative; 
     overflow-x: scroll;
     overflow-y: hidden;
+
+    max-width: 520px;
 };
 
-a{
-    color:#09f;
+#headings-section {
+    margin-left: 110px;
 }
-  
-  /* FONT AWESOME GENERIC BEAT */ 
-  .fa-beat {
-    animation:fa-beat 2s ease infinite;
-  }
-  @keyframes fa-beat {
-    0% {
-      transform:scale(1);
-    }
-    10% {
-      transform:scale(1.25);
-    }
-    30% {
-      transform:scale(1);
-    }
-  }
-  
-  .heart {
-    color:red;
-  }
 
-  button {
+#whole-ecg-data {
+    display: flex;
+    align-items:stretch;
+    justify-content: center;
+}
+
+.gridX, .gridY {
+    fill: none;
+    color: #f00;
+}
+
+.gridSmallX, .gridSmallY {
+    fill: none;
+    color: rgb(255, 111, 111);
+}
+
+#system-params {
+    display: flex;
+    justify-content: space-between;
+}
+
+#sp-item-1 {
+    font-weight: bold;
+    margin-left: 50px;
+}
+
+#sp-item-2 {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+#sp-item-3 {
+    font-weight: bold;
+    margin-right: 30px;
+}
+
+#extra-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    margin-top: 30px;
+    margin-left: 20px;
+}
+
+#ecg {
+    border-right: 1px solid red;
+    border-bottom: 1px solid red;
+    background-color: white;
+}
+
+#progressbar {
+    background-color: white;
+    border-radius: 13px;
+    /* (height of inner div) / 2 + padding */
+    padding: 3px;
+}  
+
+#progressbar>div {
+    background-color: lightblue;
+    width: 70%;
+    /* Adjust with JavaScript */
+    height: 10px;
+    border-radius: 7px;
+}
+
+#bpm {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+#heart-rate-section {
+    border-bottom: 1px solid #333;
+}
+
+.record-btn {
     width: 25px;
     height: 25px;
     font-size: 0;
-    background-color: red;
+    background-color: darkred;
     border: 0;
     border-radius: 25px;
     outline: none;
-  }
 
-  #rec-button {
     transition-property: background-color;
     -o-transition-duration: 1s;
     transition-duration: 1s;
-  } 
+}
 
-  #rec-button:hover {
+#rec-button:hover {
     background-color: red;
-  } 
+    cursor: pointer;
+}
 
-  .notRec{
+.notRec{
     background-color: darkred;
-  }
-  
-  .Rec{
+}  
+
+.Rec{
     background-color: red;
     animation-name: pulse;
     animation-duration: 1.5s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-  }
-  
-  @keyframes pulse{
+}
+
+@keyframes pulse{
     0%{
-      box-shadow: 0px 0px 3px 0px rgba(173,0,0,.3);
+        box-shadow: 0px 0px 3px 0px rgba(173,0,0,.3);
     }
     65%{
-      box-shadow: 0px 0px 3px 6px rgba(173,0,0,.3);
+        box-shadow: 0px 0px 3px 6px rgba(173,0,0,.3);
     }
     90%{
-      box-shadow: 0px 0px 3px 6px rgba(173,0,0,0);
+        box-shadow: 0px 0px 3px 6px rgba(173,0,0,0);
     }
-  }
+}
 
-  #low-pass-filter-icon {
-    color: green;
-    cursor: pointer;
-  }
+#heart-icon {
+    color:red;
+}
 
-  #low-pass-filter-icon {
+.fa-beat {
+    animation:fa-beat 2s ease infinite;
+}
+
+@keyframes fa-beat {
+    0% {
+        transform:scale(1);
+    }
+    10% {
+        transform:scale(1.25);
+    }
+    30% {
+        transform:scale(1);
+    }
+}
+
+#record-options {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+#open-folder-icon {
+    color: #ebb133;
+    margin-right: 5px;
+}
+
+#open-rec-button {
+    border-radius: 5px;
+    color: #bd8611;
+}
+
+#low-pass-filter-icon {
     color: green;
     cursor: pointer;
     transition-property: color;
     -o-transition-duration: 0.5;
     transition-duration: 0.5s;
-  }
+}
 
-  #low-pass-filter-icon:hover {
+#low-pass-filter-icon:hover {
     color: rgb(19, 231, 19);
-  }
+}
+
+@media(max-width: 739px) {
+    #whole-ecg-data {
+        display: block;
+    }
+
+    #extra-info {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
