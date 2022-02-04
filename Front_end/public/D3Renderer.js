@@ -49,51 +49,7 @@ class D3Renderer {
             .domain([0, 1000])
             .range([height-margin, 0]);
 
-        // add the X gridlines
-        this.svg.append("g")			
-            .attr("class", "gridSmallX")
-            .attr("id", "gridSmallX")
-            .attr("stroke-width", 0.5)
-            .call(make_y_gridlines(this.yScale)
-                .ticks(70)
-                .tickSize(-width + margin)
-                .tickFormat("")
-        )
-
-        // add the Y gridlines
-        this.svg.append("g")			
-            .attr("class", "gridSmallY")
-            .attr("id", "gridSmallY")
-            .attr("stroke-width", 0.5)
-            .attr("transform", "translate(0," + (height - margin) + ")")
-            .call(make_x_gridlines(this.xScale)
-                .ticks(100)
-                .tickSize(-height + margin)
-                .tickFormat("")
-            )
-
-         // add the X gridlines
-        this.svg.append("g")			
-            .attr("class", "gridX")
-            .attr("id", "gridX")
-            .attr("stroke-width", 1.5)
-            .call(make_y_gridlines(this.yScale)
-                .ticks(14)
-                .tickSize(-width + margin)
-                .tickFormat("")
-        )
-
-        // add the Y gridlines
-        this.svg.append("g")			
-            .attr("class", "gridY")
-            .attr("id", "gridY")
-            .attr("stroke-width", 1.5)
-            .attr("transform", "translate(0," + (height - margin) + ")")
-            .call(make_x_gridlines(this.xScale)
-                .ticks(20)
-                .tickSize(-height + margin)
-                .tickFormat("")
-            )
+        this.drawGrid(this.tempData);
 
         /* Add line into SVG */
         var line = d3.line()
@@ -180,71 +136,22 @@ class D3Renderer {
 
     drawPreviousData(data) {
         console.log(data);
-        d3.select("#real-time-plot").select("svg").attr("width", (data.length + margin)+"px");
+        d3.select("#real-time-plot").select("svg").attr("width", (data.length/2 + margin)+"px");
         
         /* Scale */
         this.xScale = d3.scaleLinear()
             .domain([0, data.length])
-            .range([0, data.length / 2]);
+            .range([0, data.length / 2 - margin]);
         
-        // this.yScale = d3.scaleLinear()
-        //     .domain(d3.extent(data))
-        //     .range([height-margin, 0]);
+        this.yScale = d3.scaleLinear()
+            .domain([0, 1000])
+            .range([height-margin, 0]);
+        this.drawGrid(data);
 
-        // add the X gridlines
-        this.svg.append("g")			
-            .attr("class", "gridSmallX")		
-            .attr("stroke-width", 0.5)
-            .call(make_y_gridlines(this.yScale)
-                .ticks(70)
-                .tickSize(-data.length + margin)
-                .tickFormat("")
-        )
-        
-        const tickValsSmall = [];
-        for (let i = 0; i < data.length; i+=(data.length / 175)) {
-            tickValsSmall.push(i);
-        }
 
-        // add the Y gridlines
-        this.svg.append("g")			
-            .attr("class", "gridSmallY")			
-            .attr("stroke-width", 0.5)
-            .attr("transform", "translate(0," + (height - margin) + ")")
-            .call(make_x_gridlines(this.xScale)
-                .tickValues(tickValsSmall)
-                // .ticks(data.length / 10)
-                .tickSize(-height + margin)
-                .tickFormat("")
-        )
-    
-        // add the X gridlines
-        this.svg.append("g")			
-            .attr("class", "gridX")		
-            .attr("stroke-width", 1.5)
-            .call(make_y_gridlines(this.yScale)
-                .ticks(14)
-                .tickSize(-data.length + margin)
-                .tickFormat("")
-        )
-
-        const tickVals = [];
-        for (let i = 0; i < data.length; i+=(data.length / 35)) {
-            tickVals.push(i);
-        }
-
-        // add the Y gridlines
-        this.svg.append("g")			
-            .attr("class", "gridY")				
-            .attr("stroke-width", 1.5)
-            .attr("transform", "translate(0," + (height - margin) + ")")
-            .call(make_x_gridlines(this.xScale)
-                // .ticks(Math.round(data.length / 40))
-                .tickValues(tickVals)
-                .tickSize(-height + margin)
-                .tickFormat("")
-        )
-
+        this.yScale = d3.scaleLinear()
+            .domain(d3.extent(data))
+            .range([height-margin, 0]);
         /* Add Axis into SVG */
         var xAxis = d3.axisBottom(this.xScale).ticks(5);
         var yAxis = d3.axisLeft(this.yScale).ticks(5);
@@ -269,6 +176,63 @@ class D3Renderer {
             .attr('d', line(staticTempData));    
     }
 
+    drawGrid(data) {
+
+        // add the X gridlines
+        this.svg.append("g")			
+            .attr("class", "gridSmallX")		
+            .attr("stroke-width", 0.5)
+            .call(make_y_gridlines(this.yScale)
+                .ticks(70)
+                .tickSize(-data.length/2 + margin)
+                .tickFormat("")
+        )
+        
+        const tickValsSmall = [];
+        for (let i = 0; i < data.length; i+=10) {
+            tickValsSmall.push(i);
+        }
+
+        // add the Y gridlines
+        this.svg.append("g")			
+            .attr("class", "gridSmallY")			
+            .attr("stroke-width", 0.5)
+            .attr("transform", "translate(0," + (height - margin) + ")")
+            .call(make_x_gridlines(this.xScale)
+                .tickValues(tickValsSmall)
+                // .ticks(data.length / 10)
+                .tickSize(-height + margin)
+                .tickFormat("")
+        )
+    
+        // add the X gridlines
+        this.svg.append("g")			
+            .attr("class", "gridX")		
+            .attr("stroke-width", 1.5)
+            .call(make_y_gridlines(this.yScale)
+                .ticks(14)
+                .tickSize(-data.length/2 + margin)
+                .tickFormat("")
+        )
+
+        const tickVals = [];
+        for (let i = 0; i < data.length; i+=50) {
+            tickVals.push(i);
+        }
+
+        // add the Y gridlines
+        this.svg.append("g")			
+            .attr("class", "gridY")				
+            .attr("stroke-width", 1.5)
+            .attr("transform", "translate(0," + (height - margin) + ")")
+            .call(make_x_gridlines(this.xScale)
+                // .ticks(Math.round(data.length / 40))
+                .tickValues(tickVals)
+                .tickSize(-height + margin)
+                .tickFormat("")
+        )
+    }
+
     drawCircle(x, y) {
         this.svg.append('circle')
             .attr('cx', this.xScale(x))
@@ -283,11 +247,8 @@ class D3Renderer {
 
     clearAll() {
         this.clearCircles();
-        this.svg.select(".line1")
-            .remove();    
-
-        this.svg.select(".line2")
-            .remove(); 
+        this.svg.select(".line1").remove();    
+        this.svg.select(".line2").remove(); 
 
         this.svg.select('.gridSmallX').remove();
         this.svg.select('.gridX').remove();
