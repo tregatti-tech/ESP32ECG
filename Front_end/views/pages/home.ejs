@@ -45,7 +45,7 @@
                 <h5 id="low-pass-filter-text">Low-pass filter</h5>
                 <i id="low-pass-filter-icon" class="fa fa-power-off fa-lg" aria-hidden="true"></i>
             </div>
-            <template id="view-section-template">
+            <!-- <template id="view-section-template"> -->
                 <div class="section" id="change-view-section">
                     <div id="change-view-heading">
                         <label for="change-view" id="change-view-text"><h5>Change view</h5></label>
@@ -54,10 +54,12 @@
                     <select name="change-view" id="change-view-dropdown" class="round">
                         <option>Small (default view: 6 - 9 qRs)</option>
                         <option>Large (~ 2 qRs)</option>
-                        <option>Poincare (agregate)</option>
+                        <template id="poincare-view-template">
+                            <option>Poincare (agregate)</option>
+                        </template>
                     </select>
                 </div>
-            </template>
+            <!-- </template> -->
         </div>
     </div>
 </div>
