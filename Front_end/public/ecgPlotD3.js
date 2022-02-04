@@ -2,6 +2,8 @@ import D3Renderer from './D3Renderer.js';
 import {CombFilter, AverageFilter, lowPassFilter} from './Filtration.js'
 import saveRecording from './Recording.js';
 import toggleViewSection from './toggleViewSection.js';
+import QRSDetector from './QRSDetector.js';
+
 // console.log(d3.event);
 const heartBeatValueElement = document.querySelector('#heart-beat-value');
 
@@ -13,7 +15,6 @@ ws.addEventListener('open', () => {
 
     // ws.send('Hey! How is it going?');
 });
-
 
 let filteredData = [], filteredLowPassData = [], RRIntervals = [];
 
@@ -29,11 +30,7 @@ ws.addEventListener('message', (msg) => {
     // console.log(filteredLowPassData)
 });
 
-
 let index = 0;
-let SLT = 1, ATP, ATN, lastRpeak = 0;
-let RRCount = 0;
-const SLTMIN = 1, ATPMIN = 100;
 
 let lowPassButton = document.getElementById("low-pass-filter-icon");
 let lowPass = false;
@@ -41,7 +38,6 @@ let lowPass = false;
 lowPassButton.addEventListener('click', () => {
   lowPass = !lowPass;
 })  
-
 
 const recordBtn = document.getElementById('rec-button');
 let recording = false;
@@ -74,6 +70,8 @@ fileSelector.addEventListener('change', (event) => {
     }
 
     renderer.drawPreviousData(recordingInput);
+
+    handleQRSDetection(recordingInput);
   });
 
   reader.readAsText(fileList[0]);
@@ -82,124 +80,55 @@ fileSelector.addEventListener('change', (event) => {
 let renderer = new D3Renderer();
 // renderer.setScale(1);
 
+let qRsDetector = new QRSDetector(renderer);
+
 let interval = setInterval(() => {
-    // console.log("UPDATE")
-    renderer.update(index, filteredData, filteredLowPassData, lowPass);
+  // console.log("UPDATE")
+  renderer.update(index, filteredData, filteredLowPassData, lowPass);
+  qRsDetector.update(filteredData, index);
 
-    if(recording) recordingData.push(Math.round(filteredData[index] * 1000) / 1000);
-
-    
-    //QRS DETECTION
-    
-    if (index >= 5) {
-      let countPositive = 0;
-      // console.log(countPositive);
-      // Needed only in case of possible RPeak, but calculated here
-      let ECGSlope = 0;
-      let sumBckw = 0;
-      let sumFwd = 0;
-      for (let i = 1; i <= 5; i++) {
-        const valbckw = filteredData[index - i];
-        const valfwd = filteredData[index + i];
-        const checkValue = (filteredData[index] - valbckw)*(filteredData[index]-valfwd);
-
-        if (checkValue > 0) {
-          countPositive++;
-        }
-
-        sumBckw += Math.abs(filteredData[index] - valbckw);
-        sumFwd += Math.abs(filteredData[index] - valfwd);
-        ECGSlope = sumBckw + sumFwd;
-        
-      }
-
-      if(index - lastRpeak >= 60)
-      {
-        SLT = SLT - SLT / 128;
-        ATP--;
-        ATN++;
-      }
-        
-      if (countPositive == 5) { // more conditions needed... use SLTValue (ECGSlope for current smaple) and more
-      // detectedRPeaks.push({
-      // name: 'RPeak',
-      // valueR: data[index]
-      // });
-        // console.log('Possible RPeak detected...!');
-
-        let maxPossibleRVal = Math.max(...filteredData.slice(index, index + 60).map(Math.abs));
-        
-        if(Math.abs(maxPossibleRVal - Math.abs(filteredData[index])) < 2)
-        if(ECGSlope > SLT) {
-          
-          RRCount++;
-
-          renderer.drawCircle(index % 1000, filteredData[index]);
-
-          SLT = ECGSlope;
-          if(filteredData[index] > 0)
-            ATP = filteredData[index];
-          else
-            ATN = filteredData[index];
-
-          if (index < 20000) {
-            const RRInterval = (index - lastRpeak) * 4; // this gives us RRInterval length (in ms)
-            RRIntervals.push(RRInterval);
-          }
-
-          lastRpeak = index;
-        }
-        else if(ECGSlope > SLT / 2 && filteredData[index] > 2 * ATP) {
-          
-          RRCount++;
-
-          renderer.drawCircle(index % 1000, filteredData[index]);
-
-          SLT = ECGSlope;
-          if(filteredData[index] > 0)
-            ATP = filteredData[index];
-          else
-            ATN = filteredData[index];
-
-          if (index < 20000) {
-            const RRInterval = (index - lastRpeak) * 4; // this gives us RRInterval length (in ms)
-            RRIntervals.push(RRInterval);
-          }
-
-          lastRpeak = index;
-        }
-        else if(ECGSlope > SLT / 2 && filteredData[index] < 2 * ATN) {
-          
-          RRCount++;
-
-          renderer.drawCircle(index % 1000, filteredData[index]);
-
-          SLT = ECGSlope;
-          if(filteredData[index] > 0)
-            ATP = filteredData[index];
-          else
-            ATN = filteredData[index];
-
-          if (index < 20000) {
-            const RRInterval = (index - lastRpeak) * 4; // this gives us RRInterval length (in ms)
-            RRIntervals.push(RRInterval);
-          }
-
-          lastRpeak = index;
-        }
-
-      if(SLT <= SLTMIN)
-        SLT = ECGSlope;
-    }
-  }
+  if(recording) recordingData.push(Math.round(filteredData[index] * 1000) / 1000);
 
   if(index % 1000 === 0) {
-    const heartBeat = ((RRCount / 4) * 60);
+    const heartBeat = ((qRsDetector.RRCount / 4) * 60);
     // console.log(heartBeat);
     heartBeatValueElement.innerText = heartBeat;
-    RRCount = 0;
+    qRsDetector.RRCount = 0;
   }
   if(index % 1000 === 0) 
     renderer.clearCircles();
   index++;
 }, 4);
+
+const changeViewElement = document.querySelector('#change-view-dropdown');
+changeViewElement.addEventListener('change', () => {
+  const selectedView = changeViewElement.value;
+  if (selectedView === 'small') {
+    renderer.setScale(1);
+    renderer.clearAll();
+    renderer.drawPreviousData(recordingInput);
+  } 
+  else if (selectedView === 'big') {
+    renderer.setScale(2);
+    renderer.clearAll();
+    renderer.drawPreviousData(recordingInput);
+  } 
+  else if (selectedView === 'poincare') {
+    renderer.clearAll();
+
+    const RRLength = qRsDetector.RRIntervals.length;
+
+    renderer.drawPoincareAxis();
+    for (let i = 0; i < RRLength - 1; i++) {
+      renderer.drawPoincareDots(qRsDetector.RRIntervals[i], qRsDetector.RRIntervals[i + 1]);
+    }
+  }
+})
+
+const handleQRSDetection = (input) => {
+    qRsDetector.clearAll();
+    for (let i = 0; i < input.length; i++) {
+      qRsDetector.update(input, i);
+    }
+    console.log(qRsDetector.RRIntervals);
+}

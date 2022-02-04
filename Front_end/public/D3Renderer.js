@@ -1,6 +1,5 @@
 import * as d3 from 'https://unpkg.com/d3?module'
 
-
 const width = 500;
 const height = 300;
 const margin = 50;
@@ -140,7 +139,6 @@ class D3Renderer {
     }
 
     drawPreviousData(data) {
-        console.log(data);
         d3.select("#real-time-plot").select("svg").attr("width", (data.length / 2 + margin)+"px");
         
         /* Scale */
@@ -254,6 +252,44 @@ class D3Renderer {
             .attr('cy', this.yScale(y))
             .attr('r', 2)
             .attr('stroke', 'black');
+    }
+
+    drawPoincareDots(x, y) {
+        this.svg.append('circle')
+            .attr('cx', this.xScale(x))
+            .attr('cy', this.yScale(y))
+            .attr('r', 2)
+            .style('fill', '#000000')
+            .attr('stroke', 'black');
+    }
+
+    drawPoincareAxis() {
+        /* Scale */
+        this.xScale = d3.scaleLinear()
+            .domain([0, 1000])
+            .range([0, width - margin]);
+        
+        this.yScale = d3.scaleLinear()
+            .domain([0, 1000])
+            .range([height-margin, 0]);
+
+        /* Add Axis into SVG */
+        var xAxis = d3.axisBottom(this.xScale).ticks(5);
+        var yAxis = d3.axisLeft(this.yScale).ticks(5);
+
+        this.svg.select(".x.axis")
+            .call(xAxis);
+
+        this.svg.select(".y.axis")
+            .call(yAxis);
+
+        var line = d3.line()
+        .x(d => this.xScale(d.time))
+        .y(d => this.yScale(d.value));
+        
+        this.svg.append('path')
+            .attr('class', 'line1')
+            .attr('d', line([{ time: 0, value: 0 }, { time: 1000, value: 1000 }]));   
     }
 
     setScale(newScale) {
