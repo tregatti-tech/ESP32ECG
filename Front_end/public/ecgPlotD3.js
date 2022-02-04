@@ -56,6 +56,7 @@ recordBtn.addEventListener('click', () => {
 const fileSelector = document.getElementById('open-rec-button');
 let recordingInput = [];
 let live = true;
+let numberOfFileLoaded = 0;
 
 fileSelector.addEventListener('change', (event) => {
   const fileList = event.target.files;
@@ -67,7 +68,10 @@ fileSelector.addEventListener('change', (event) => {
     clearInterval(interval);
     renderer.clearAll();
 
-    toggleViewSection();
+    numberOfFileLoaded++;
+    if (numberOfFileLoaded === 1) {
+      toggleViewSection();
+    }
 
     renderer.drawPreviousData(recordingInput);
   });
