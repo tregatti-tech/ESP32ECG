@@ -15,7 +15,7 @@ ws.addEventListener('open', () => {
 });
 
 
-let filteredData = [], filteredLowPassData = [];
+let filteredData = [], filteredLowPassData = [], RRIntervals = [];
 
 ws.addEventListener('message', (msg) => {
     const parsedData = JSON.parse(msg.data);
@@ -26,7 +26,7 @@ ws.addEventListener('message', (msg) => {
 
     filteredData.push(...f2);
     filteredLowPassData.push(...f3);
-    console.log(filteredLowPassData)
+    // console.log(filteredLowPassData)
 });
 
 
@@ -141,6 +141,12 @@ let interval = setInterval(() => {
             ATP = filteredData[index];
           else
             ATN = filteredData[index];
+
+          if (index < 20000) {
+            const RRInterval = (index - lastRpeak) * 4; // this gives us RRInterval length (in ms)
+            RRIntervals.push(RRInterval);
+          }
+
           lastRpeak = index;
         }
         else if(ECGSlope > SLT / 2 && filteredData[index] > 2 * ATP) {
@@ -154,6 +160,12 @@ let interval = setInterval(() => {
             ATP = filteredData[index];
           else
             ATN = filteredData[index];
+
+          if (index < 20000) {
+            const RRInterval = (index - lastRpeak) * 4; // this gives us RRInterval length (in ms)
+            RRIntervals.push(RRInterval);
+          }
+
           lastRpeak = index;
         }
         else if(ECGSlope > SLT / 2 && filteredData[index] < 2 * ATN) {
@@ -167,6 +179,12 @@ let interval = setInterval(() => {
             ATP = filteredData[index];
           else
             ATN = filteredData[index];
+
+          if (index < 20000) {
+            const RRInterval = (index - lastRpeak) * 4; // this gives us RRInterval length (in ms)
+            RRIntervals.push(RRInterval);
+          }
+
           lastRpeak = index;
         }
 
@@ -177,7 +195,7 @@ let interval = setInterval(() => {
 
   if(index % 1000 === 0) {
     const heartBeat = ((RRCount / 4) * 60);
-    console.log(heartBeat);
+    // console.log(heartBeat);
     heartBeatValueElement.innerText = heartBeat;
     RRCount = 0;
   }
