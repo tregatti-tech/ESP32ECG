@@ -1,6 +1,7 @@
 import D3Renderer from './D3Renderer.js';
 import {CombFilter, AverageFilter, lowPassFilter} from './Filtration.js'
 import saveRecording from './Recording.js';
+import toggleViewSection from './toggleViewSection.js';
 // console.log(d3.event);
 const heartBeatValueElement = document.querySelector('#heart-beat-value');
 
@@ -65,6 +66,8 @@ fileSelector.addEventListener('change', (event) => {
     live = false;
     clearInterval(interval);
     renderer.clearAll();
+
+    toggleViewSection();
 
     renderer.drawPreviousData(recordingInput);
   });

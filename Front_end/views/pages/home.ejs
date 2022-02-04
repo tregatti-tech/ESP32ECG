@@ -1,50 +1,63 @@
 <div id="whole-module">
-  <div id="headings-section">
-      <h1>ECG <i class="fas fa-diagnoses"></i></h1>
-      <p>Showing qrs complexes through timeline</p>
-      <p>Heart rate and SpO2</p>
-  </div>
-  
-  <div id="whole-ecg-data">
-      <div id="ecg">
-          <div id="ecg-picture">
-              <div id="real-time-plot"></div>
-          </div>
-          <div id="system-params">
-              <div id="sp-item-1"><h6>25 mm/s</h6></div>
-              <div id="sp-item-2"><h6>10 mm/mV</h6></div>
-              <div id="sp-item-3"><h6>... Hz</h6></div>
-          </div>
-      </div>
+    <div id="headings-section">
+        <h1>ECG <i class="fas fa-diagnoses"></i></h1>
+        <p>Showing qrs complexes through timeline</p>
+        <p>Heart rate and SpO2</p>
+    </div>
 
-      <div id="extra-info">
-          <div class="section" id="heart-rate-section">
-              <p><h5>Heart rate</h5></p>
-              <div id="bpm">
-                  <i id="heart-icon" class="fa fa-heart fa-2x fa-beat"></i>
-                  <h4 id="heart-beat-value"></h4>
-              </div>
-          </div>
-          <div class="section" id="SpO2-section">
-              <h5>SpO2 %</h5>
-              <div id="progressbar">
-                  <div></div>
-              </div>
-          </div>
-          <div class="section" id="recording-section">
-              <h5>Recording</h5>
-              <button class="record-btn" id="rec-button"></button>
-          </div>
-          <div class="section" id="open-recording-section">
-              <div id="record-options">
-                  <h5><i id="open-folder-icon" class="fas fa-folder-open fa-lg"></i>Open record</h5>
-                  <input id="open-rec-button" type="file" accept=".json"></input>
-              </div>
-          </div>
-          <div class="section" id="low-pass-filter-section">
-              <h5 id="low-pass-filter-text">Low-pass filter</h5>
-              <i id="low-pass-filter-icon" class="fa fa-power-off fa-lg" aria-hidden="true"></i>
-          </div>
-      </div>
-  </div>
+    <div id="whole-ecg-data">
+        <div id="ecg">
+            <div id="ecg-picture">
+                <div id="real-time-plot"></div>
+            </div>
+            <div id="system-params">
+                <div id="sp-item-1"><h6>25 mm/s</h6></div>
+                <div id="sp-item-2"><h6>10 mm/mV</h6></div>
+                <div id="sp-item-3"><h6>... Hz</h6></div>
+            </div>
+        </div>
+
+        <div id="extra-info">
+            <div class="section" id="heart-rate-section">
+                <p><h5>Heart rate</h5></p>
+                <div id="bpm">
+                    <i id="heart-icon" class="fa fa-heart fa-2x fa-beat"></i>
+                    <h4 id="heart-beat-value"></h4>
+                </div>
+            </div>
+            <div class="section" id="SpO2-section">
+                <h5>SpO2 %</h5>
+                <div id="progressbar">
+                    <div></div>
+                </div>
+            </div>
+            <div class="section" id="recording-section">
+                <h5>Recording</h5>
+                <button class="record-btn" id="rec-button"></button>
+            </div>
+            <div class="section" id="open-recording-section">
+                <div id="record-options">
+                    <h5><i id="open-folder-icon" class="fas fa-folder-open fa-lg"></i>Open record</h5>
+                    <input id="open-rec-button" type="file" accept=".json"></input>
+                </div>
+            </div>
+            <div class="section" id="low-pass-filter-section">
+                <h5 id="low-pass-filter-text">Low-pass filter</h5>
+                <i id="low-pass-filter-icon" class="fa fa-power-off fa-lg" aria-hidden="true"></i>
+            </div>
+            <template id="view-section-template">
+                <div class="section" id="change-view-section">
+                    <div id="change-view-heading">
+                        <label for="change-view" id="change-view-text"><h5>Change view</h5></label>
+                        <i id="change-view-icon" class="fas fa-eye fa-lg" aria-hidden="true"></i>
+                    </div>
+                    <select name="change-view" id="change-view-dropdown" class="round">
+                        <option>Small (default view: 6 - 9 qRs)</option>
+                        <option>Large (~ 2 qRs)</option>
+                        <option>Poincare (agregate)</option>
+                    </select>
+                </div>
+            </template>
+        </div>
+    </div>
 </div>
