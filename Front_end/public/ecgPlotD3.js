@@ -80,6 +80,7 @@ fileSelector.addEventListener('change', (event) => {
 });
 
 let renderer = new D3Renderer();
+// renderer.setScale(1);
 
 let interval = setInterval(() => {
     // console.log("UPDATE")
@@ -128,7 +129,7 @@ let interval = setInterval(() => {
 
         let maxPossibleRVal = Math.max(...filteredData.slice(index, index + 60).map(Math.abs));
         
-        if(maxPossibleRVal === Math.abs(filteredData[index]))
+        if(Math.abs(maxPossibleRVal - Math.abs(filteredData[index])) < 2)
         if(ECGSlope > SLT) {
           
           RRCount++;

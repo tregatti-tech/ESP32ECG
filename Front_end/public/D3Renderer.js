@@ -20,8 +20,9 @@ class D3Renderer {
     constructor() {
         let data = [];
         
+        this.scale = 1;
         this.tempData = [];
-        this.tempData1 = []
+        this.tempData1 = [];
         this.tempData2 = [];
         
         for(let i=0; i < 1000; i++) {
@@ -107,6 +108,10 @@ class D3Renderer {
             this.tempData1 = this.tempData.slice(0, (index+1) % 1000);
             this.tempData2 = this.tempData.slice((index+20) % 1000);
         }
+
+        this.xScale = d3.scaleLinear()
+            .domain([0, 1000 / this.scale])
+            .range([0, width-margin]);
         
         this.yScale = d3.scaleLinear()
             .domain(d3.extent(filteredData))
@@ -136,7 +141,7 @@ class D3Renderer {
 
     drawPreviousData(data) {
         console.log(data);
-        d3.select("#real-time-plot").select("svg").attr("width", (data.length/2 + margin)+"px");
+        d3.select("#real-time-plot").select("svg").attr("width", (data.length / 2 + margin)+"px");
         
         /* Scale */
         this.xScale = d3.scaleLinear()
@@ -146,12 +151,14 @@ class D3Renderer {
         this.yScale = d3.scaleLinear()
             .domain([0, 1000])
             .range([height-margin, 0]);
+
         this.drawGrid(data);
 
 
         this.yScale = d3.scaleLinear()
             .domain(d3.extent(data))
             .range([height-margin, 0]);
+
         /* Add Axis into SVG */
         var xAxis = d3.axisBottom(this.xScale).ticks(5);
         var yAxis = d3.axisLeft(this.yScale).ticks(5);
@@ -169,8 +176,8 @@ class D3Renderer {
         }, []);
         
         var line = d3.line()
-        .x(d => this.xScale(d.time))
-        .y(d => this.yScale(d.value));
+            .x(d => this.xScale(d.time))
+            .y(d => this.yScale(d.value));
     
         this.svg.append("path").attr("class", 'line1')
             .attr('d', line(staticTempData));    
@@ -178,20 +185,25 @@ class D3Renderer {
 
     drawGrid(data) {
 
+        const tickValsSmall = [];
+        for (let i = 0; i < data.length; i += 10) {
+            tickValsSmall.push(i);
+        }
+
+        const tickValsSmallX = [];
+        for (let i = 0; i < 1000; i += 18) {
+            tickValsSmallX.push(i);
+        }
+
         // add the X gridlines
         this.svg.append("g")			
             .attr("class", "gridSmallX")		
             .attr("stroke-width", 0.5)
             .call(make_y_gridlines(this.yScale)
-                .ticks(70)
-                .tickSize(-data.length/2 + margin)
-                .tickFormat("")
-        )
+                .tickValues(tickValsSmallX)
+                .tickSize(-data.length / 2 + margin)
+                .tickFormat(""));
         
-        const tickValsSmall = [];
-        for (let i = 0; i < data.length; i+=10) {
-            tickValsSmall.push(i);
-        }
 
         // add the Y gridlines
         this.svg.append("g")			
@@ -202,23 +214,27 @@ class D3Renderer {
                 .tickValues(tickValsSmall)
                 // .ticks(data.length / 10)
                 .tickSize(-height + margin)
-                .tickFormat("")
-        )
+                .tickFormat(""));
     
+        const tickVals = [];
+        for (let i = 0; i < data.length; i+=50) {
+            tickVals.push(i);
+        }
+
+        const tickValsX = [];
+        for (let i = 0; i < 1000; i += 90) {
+            tickValsX.push(i);
+        }
+
         // add the X gridlines
         this.svg.append("g")			
             .attr("class", "gridX")		
             .attr("stroke-width", 1.5)
             .call(make_y_gridlines(this.yScale)
-                .ticks(14)
-                .tickSize(-data.length/2 + margin)
-                .tickFormat("")
-        )
+                .tickValues(tickValsX)
+                .tickSize(-data.length / 2 + margin)
+                .tickFormat(""));
 
-        const tickVals = [];
-        for (let i = 0; i < data.length; i+=50) {
-            tickVals.push(i);
-        }
 
         // add the Y gridlines
         this.svg.append("g")			
@@ -229,8 +245,7 @@ class D3Renderer {
                 // .ticks(Math.round(data.length / 40))
                 .tickValues(tickVals)
                 .tickSize(-height + margin)
-                .tickFormat("")
-        )
+                .tickFormat(""));
     }
 
     drawCircle(x, y) {
@@ -241,19 +256,39 @@ class D3Renderer {
             .attr('stroke', 'black');
     }
 
+    setScale(newScale) {
+        this.scale = newScale;
+
+        this.xScale = d3.scaleLinear()
+            .domain([0, 1000 / this.scale])
+            .range([0, width-margin]);
+        
+        this.yScale = d3.scaleLinear()
+            .domain([0, 1000 / this.scale])
+            .range([height-margin, 0]);
+
+        this.clearGrid();
+
+        this.drawGrid(this.tempData);
+    }
+
     clearCircles() {
         this.svg.selectAll("circle").remove();
     }
 
-    clearAll() {
-        this.clearCircles();
-        this.svg.select(".line1").remove();    
-        this.svg.select(".line2").remove(); 
-
+    clearGrid() {
         this.svg.select('.gridSmallX').remove();
         this.svg.select('.gridX').remove();
         this.svg.select('.gridSmallY').remove();
         this.svg.select('.gridY').remove();
+    }
+
+    clearAll() {
+        this.clearCircles();
+        this.clearGrid();
+        this.svg.select(".line1").remove();    
+        this.svg.select(".line2").remove(); 
+
     }
 }
 
