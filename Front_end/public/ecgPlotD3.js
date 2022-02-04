@@ -3,9 +3,13 @@ import {CombFilter, AverageFilter, lowPassFilter} from './Filtration.js'
 import saveRecording from './Recording.js';
 import toggleViewSection from './toggleViewSection.js';
 import QRSDetector from './QRSDetector.js';
+import toggleButtonsStyle from './toggleButtonsStyle.js';
 
 // console.log(d3.event);
 const heartBeatValueElement = document.querySelector('#heart-beat-value');
+
+// toggle buttons style
+toggleButtonsStyle();
 
 // for production we should use wss, but for development ws is fine 
 const ws = new WebSocket('ws://localhost:3000');

@@ -1,4 +1,4 @@
-(() => {
+export default function toggleButtonsStyle() {
     const recButton = document.getElementById('rec-button');
     recButton.classList.add('notRec');
     recButton.addEventListener('click', () => {
@@ -22,4 +22,4 @@
             lowPassFilterText.style.color = 'rgb(90, 245, 19)';
         }
     })
-})();
+};
