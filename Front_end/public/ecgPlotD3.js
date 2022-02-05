@@ -11,19 +11,17 @@ const heartBeatValueElement = document.querySelector('#heart-beat-value');
 // toggle buttons style
 toggleButtonsStyle();
 
-// for production we should use wss, but for development ws is fine 
-const ws = new WebSocket('ws://localhost:3000');
+const socket = io("http://localhost:3000");
 
-ws.addEventListener('open', () => {
-    console.log('We are connected!');
-
-    // ws.send('Hey! How is it going?');
-});
+socket.on('connect', () => {
+  console.log(`We are connected, with id: ${socket.id}!`);
+  // socket.emit("hello", "Hello from client!");
+})
 
 let filteredData = [], filteredLowPassData = [], RRIntervals = [];
 
-ws.addEventListener('message', (msg) => {
-    const parsedData = JSON.parse(msg.data);
+socket.on('message', (msg) => {
+    const parsedData = JSON.parse(msg);
     // console.log(parsedData);
     let f1 = CombFilter(parsedData);
     let f2 = AverageFilter(f1);

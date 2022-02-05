@@ -1,13 +1,20 @@
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
+
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http, {
+    cors: {
+        origin: "http://localhost:8080",
+        methods: ["GET", "POST"]
+    }
+});
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser'); 
-const { json } = require('express/lib/response');
-const { clearInterval } = require('timers');
 
 const PORT = process.env.PORT || 3000
 
-const wss = new WebSocket.Server({ port: PORT });
+// const wss = new WebSocket.Server({ port: PORT });
 
 const csvData = [];
 let jsonData = [];
@@ -21,44 +28,33 @@ rStream
 fs.readFile(path.join(__dirname, 'data', 'ws.data'), 'utf8', function (err, data) {
     if (err) throw err;
     jsonData = JSON.parse(data);
-  })
+})
 
 // listen for connection from the clients 
-wss.on('connection', (ws) => {
+io.on('connection', (socket) => {
     console.log('Client was connected.');
-
-    // const rs = fs.createReadStream(path.join(__dirname, 'data', 'data2.csv'), { encoding: 'utf-8' }); 
-    // rs
-    //     .pipe(csv())
-    //     .on('data', (dataChunk) => ws.send(JSON.stringify(dataChunk)))
-    //     .on('end', () => console.log('CSV File Exhausted...'));
 
     let i = 0;
     // console.log(jsonData);
 
-    ws.send(JSON.stringify(jsonData[i]));
+    socket.emit('message', JSON.stringify(jsonData[i]));
     let handler = setInterval(() => {
         i++;
         if(i < jsonData.length)
-            ws.send(JSON.stringify(jsonData[i]));
+            socket.emit('message', JSON.stringify(jsonData[i]));
         else clearInterval(handler);
     }, 4000);
 
-    ws.on('message', (data) => {
-        // console.log(data);
-        fs.writeFile(path.join(__dirname, 'data', 'record.wav'), data, err => {
-            if (err) {
-                console.error(err);
-            } else {
-                console.log('File was written successfully!');
-            }
-        });
-    })
+    socket.on('hello', msg => console.log(msg));
 
-    ws.on('close', () => {
+    socket.on('disconnect', () => {
         console.log('Client has diconnected.');
     })
 })
+
+http.listen(PORT, () => {
+    console.log(`Server is listening on PORT ${PORT}...`);
+});
 
 process.on('uncaughtException', (err) => {
     console.error(`Uncaught error: ${err}`);

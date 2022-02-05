@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "d3": "^7.2.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
-    "csv-parser": "^3.0.0",
     "nodemon": "^2.0.15",
+    "socket.io": "^4.4.1",
     "ws": "^8.3.0"
   },
-  "devDependencies": {},
   "scripts": {
     "start": "nodemon index.js",
     "dev": "nodemon ws_server.js"
