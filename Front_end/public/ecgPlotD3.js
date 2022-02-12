@@ -16,11 +16,7 @@ const socket = io("http://localhost:3000");
 socket.on('connect', () => {
   console.log(`We are connected, with id: ${socket.id}!`);
   // socket.emit("hello", "Hello from client!");
-})
-
-let filteredData = [], filteredLowPassData = [], RRIntervals = [];
-
-socket.on('message', (msg) => {
+  socket.on('message', (msg) => {
     const parsedData = JSON.parse(msg);
     // console.log(parsedData);
     let f1 = CombFilter(parsedData);
@@ -30,7 +26,10 @@ socket.on('message', (msg) => {
     filteredData.push(...f2);
     filteredLowPassData.push(...f3);
     // console.log(filteredLowPassData)
-});
+  });
+})
+
+let filteredData = [], filteredLowPassData = [], RRIntervals = [];
 
 let index = 0;
 
