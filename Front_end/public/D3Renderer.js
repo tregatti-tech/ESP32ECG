@@ -37,7 +37,25 @@ class D3Renderer {
             .attr("width", (width+margin)+"px")
             .attr("height", (height+margin)+"px")
             .append('g')
-            .attr("transform", `translate(${margin}, ${margin})`);
+            .attr("transform", `translate(${margin}, ${margin})`)
+            
+        d3.select(window).on("resize", () => {
+            let targetWidth = window.innerWidth / 2;
+            let aspect = width / height;
+            // console.log(targetWidth)
+
+            d3.select("#ecg")
+                .attr("width", targetWidth + "px")
+                .attr("height", targetWidth / aspect + "px");
+
+            d3.select("#ecg-picture")
+                .attr("width", targetWidth + "px")
+                .attr("height", targetWidth / aspect + "px");
+
+            d3.select("#real-time-plot")
+                .attr("width", targetWidth + "px")
+                .attr("height", targetWidth / aspect + "px");
+         });
 
 
         /* Scale */
@@ -109,8 +127,8 @@ class D3Renderer {
         }
 
         this.xScale = d3.scaleLinear()
-            .domain([0, 1000 / this.scale])
-            .range([0, width-margin]);
+            .domain([0, 1000])
+            .range([0, width * this.scale-margin]);
         
         this.yScale = d3.scaleLinear()
             .domain(d3.extent(filteredData))
@@ -139,12 +157,12 @@ class D3Renderer {
     }
 
     drawPreviousData(data) {
-        d3.select("#real-time-plot").select("svg").attr("width", (data.length / 2 + margin)+"px");
+        d3.select("#real-time-plot").select("svg").attr("width", (data.length / 2 * this.scale + margin)+"px");
         
         /* Scale */
         this.xScale = d3.scaleLinear()
             .domain([0, data.length])
-            .range([0, data.length / 2 - margin]);
+            .range([0, data.length / 2 * this.scale - margin]);
         
         this.yScale = d3.scaleLinear()
             .domain([0, 1000])
@@ -199,7 +217,7 @@ class D3Renderer {
             .attr("stroke-width", 0.5)
             .call(make_y_gridlines(this.yScale)
                 .tickValues(tickValsSmallX)
-                .tickSize(-data.length / 2 + margin)
+                .tickSize(-data.length / 2 * this.scale + margin)
                 .tickFormat(""));
         
 
@@ -230,7 +248,7 @@ class D3Renderer {
             .attr("stroke-width", 1.5)
             .call(make_y_gridlines(this.yScale)
                 .tickValues(tickValsX)
-                .tickSize(-data.length / 2 + margin)
+                .tickSize(-data.length / 2 * this.scale + margin)
                 .tickFormat(""));
 
 
@@ -264,6 +282,8 @@ class D3Renderer {
     }
 
     drawPoincareAxis() {
+        d3.select("#real-time-plot").select("svg").attr("width", (width + margin)+"px");
+
         /* Scale */
         this.xScale = d3.scaleLinear()
             .domain([0, 1000])
@@ -294,18 +314,19 @@ class D3Renderer {
 
     setScale(newScale) {
         this.scale = newScale;
+        d3.select("#real-time-plot").select("svg").attr("width", (this.tempData.length / 2 * newScale + margin)+"px");
 
         this.xScale = d3.scaleLinear()
-            .domain([0, 1000 / this.scale])
-            .range([0, width-margin]);
+            .domain([0, 1000])
+            .range([0, width * newScale - margin]);
         
         this.yScale = d3.scaleLinear()
-            .domain([0, 1000 / this.scale])
-            .range([height-margin, 0]);
+            .domain([0, 1000])
+            .range([height - margin, 0]);
 
         this.clearGrid();
 
-        this.drawGrid(this.tempData);
+        this.drawGrid(Array.from(Array(1000).keys()));
     }
 
     clearCircles() {

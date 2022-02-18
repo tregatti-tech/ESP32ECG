@@ -11,6 +11,7 @@ const heartBeatValueElement = document.querySelector('#heart-beat-value');
 // toggle buttons style
 toggleButtonsStyle();
 
+// const socket = io("http://192.168.1.136:3000");
 const socket = io("http://localhost:3000");
 
 socket.on('connect', () => {
@@ -63,13 +64,16 @@ fileSelector.addEventListener('change', (event) => {
     recordingInput = JSON.parse(event.target.result);
     live = false;
     clearInterval(interval);
-    renderer.clearAll();
 
     numberOfFileLoaded++;
     if (numberOfFileLoaded === 1) {
       toggleViewSection();
     }
 
+    document.querySelector('#change-view-dropdown').value = "small";
+    renderer.setScale(1);
+    renderer.clearAll();
+    
     renderer.drawPreviousData(recordingInput);
 
     handleQRSDetection(recordingInput);
@@ -106,13 +110,17 @@ changeViewElement.addEventListener('change', () => {
   const selectedView = changeViewElement.value;
   if (selectedView === 'small') {
     renderer.setScale(1);
-    renderer.clearAll();
-    renderer.drawPreviousData(recordingInput);
+    if(!live) {
+      renderer.clearAll();
+      renderer.drawPreviousData(recordingInput);
+    }
   } 
   else if (selectedView === 'big') {
     renderer.setScale(2);
-    renderer.clearAll();
-    renderer.drawPreviousData(recordingInput);
+    if(!live) {
+      renderer.clearAll();
+      renderer.drawPreviousData(recordingInput);
+    }
   } 
   else if (selectedView === 'poincare') {
     renderer.clearAll();
